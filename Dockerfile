@@ -23,13 +23,14 @@ RUN apt-get update && \
     && apt-get clean
 
 # Install Miniconda and add to PATH
-RUN curl https://repo.continuum.io/miniconda/Miniconda3-4.7.12.1-Linux-x86_64.sh -O && \
+RUN curl -L https://repo.continuum.io/miniconda/Miniconda3-4.7.12.1-Linux-x86_64.sh -O && \
     bash Miniconda3-4.7.12.1-Linux-x86_64.sh -bf -p /usr/miniconda3/ && \
     rm Miniconda3-4.7.12.1-Linux-x86_64.sh && \
     /usr/miniconda3/bin/conda clean -tipsy && \
     ln -s /usr/miniconda3/etc/profile.d/conda.sh /etc/profile.d/conda.sh && \
     echo ". /usr/miniconda3/etc/profile.d/conda.sh" >> ~/.bashrc && \
     echo "conda activate base" >> ~/.bashrc
+
 
 # Add conda to PATH and set locale
 ENV PATH="/usr/miniconda3/bin:${PATH}"
@@ -60,5 +61,9 @@ RUN echo -e "library(tinytex)\ntinytex::install_tinytex(dir='/usr/.TinyTeX')"| R
 # Open port for running Jupyter Notebook
 # (Jupyter Notebook has to be separately installed in the container)
 EXPOSE 8888
+
+# Add conda envs dir
+ENV CONDA_ENVS_PATH="/course/envs"
+RUN mkdir /course/envs
 
 CMD snakemake -rp --configfile config.yml
